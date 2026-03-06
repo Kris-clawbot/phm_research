@@ -1,0 +1,18 @@
+[
+  {
+    "task": "prognostics",
+    "count": 145
+  },
+  {
+    "task": "diagnostics",
+    "count": 31
+  },
+  {
+    "task": "fault_detection",
+    "count": 19
+  },
+  {
+    "task": "anomaly_detection",
+    "count": 13
+  }
+]

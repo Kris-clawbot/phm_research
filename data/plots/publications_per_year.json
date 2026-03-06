@@ -1,0 +1,26 @@
+[
+  {
+    "year": 2023,
+    "article": 5,
+    "review": 0,
+    "total": 5
+  },
+  {
+    "year": 2024,
+    "article": 0,
+    "review": 1,
+    "total": 1
+  },
+  {
+    "year": 2025,
+    "article": 167,
+    "review": 15,
+    "total": 182
+  },
+  {
+    "year": 2026,
+    "article": 31,
+    "review": 0,
+    "total": 31
+  }
+]

@@ -1,0 +1,91 @@
+{
+  "id": "top_journals",
+  "title": "Top journals/venues",
+  "version": 1,
+  "encodings": {
+    "y": "label",
+    "x": "count"
+  },
+  "data": [
+    {
+      "label": "Sensors",
+      "count": 16
+    },
+    {
+      "label": "Applied Sciences",
+      "count": 13
+    },
+    {
+      "label": "Batteries",
+      "count": 8
+    },
+    {
+      "label": "Reliability Engineering & System Safety",
+      "count": 7
+    },
+    {
+      "label": "World Electric Vehicle Journal",
+      "count": 6
+    },
+    {
+      "label": "SSRN Electronic Journal",
+      "count": 6
+    },
+    {
+      "label": "Scientific Reports",
+      "count": 5
+    },
+    {
+      "label": "Processes",
+      "count": 4
+    },
+    {
+      "label": "Preprints.org",
+      "count": 4
+    },
+    {
+      "label": "Energies",
+      "count": 4
+    },
+    {
+      "label": "Measurement",
+      "count": 3
+    },
+    {
+      "label": "Machines",
+      "count": 3
+    },
+    {
+      "label": "Electronics",
+      "count": 3
+    },
+    {
+      "label": "ArXiv.org",
+      "count": 3
+    },
+    {
+      "label": "Zenodo (CERN European Organization for Nuclear Research)",
+      "count": 2
+    },
+    {
+      "label": "Sustainability",
+      "count": 2
+    },
+    {
+      "label": "PHM Society Asia-Pacific Conference",
+      "count": 2
+    },
+    {
+      "label": "Mechanical Systems and Signal Processing",
+      "count": 2
+    },
+    {
+      "label": "Mathematics",
+      "count": 2
+    },
+    {
+      "label": "International Journal of Prognostics and Health Management",
+      "count": 2
+    }
+  ]
+}

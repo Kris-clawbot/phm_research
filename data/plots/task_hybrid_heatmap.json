@@ -1,0 +1,162 @@
+[
+  {
+    "task": "(none)",
+    "hybrid": "(none)",
+    "count": 44
+  },
+  {
+    "task": "(none)",
+    "hybrid": "digital_twin",
+    "count": 5
+  },
+  {
+    "task": "(none)",
+    "hybrid": "bayesian_hybrid",
+    "count": 5
+  },
+  {
+    "task": "(none)",
+    "hybrid": "residual_learning",
+    "count": 1
+  },
+  {
+    "task": "(none)",
+    "hybrid": "physics_informed",
+    "count": 2
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "(none)",
+    "count": 10
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "physics_informed",
+    "count": 2
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "bayesian_hybrid",
+    "count": 1
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "residual_learning",
+    "count": 3
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "state_space",
+    "count": 3
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "digital_twin",
+    "count": 2
+  },
+  {
+    "task": "fault_detection",
+    "hybrid": "grey_box",
+    "count": 1
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "(none)",
+    "count": 17
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "digital_twin",
+    "count": 6
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "physics_informed",
+    "count": 3
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "state_space",
+    "count": 3
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "bayesian_hybrid",
+    "count": 5
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "grey_box",
+    "count": 1
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "residual_learning",
+    "count": 1
+  },
+  {
+    "task": "anomaly_detection",
+    "hybrid": "(none)",
+    "count": 7
+  },
+  {
+    "task": "anomaly_detection",
+    "hybrid": "physics_informed",
+    "count": 1
+  },
+  {
+    "task": "anomaly_detection",
+    "hybrid": "bayesian_hybrid",
+    "count": 2
+  },
+  {
+    "task": "anomaly_detection",
+    "hybrid": "residual_learning",
+    "count": 1
+  },
+  {
+    "task": "anomaly_detection",
+    "hybrid": "state_space",
+    "count": 1
+  },
+  {
+    "task": "anomaly_detection",
+    "hybrid": "digital_twin",
+    "count": 2
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "(none)",
+    "count": 91
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "bayesian_hybrid",
+    "count": 18
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "state_space",
+    "count": 17
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "digital_twin",
+    "count": 9
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "physics_informed",
+    "count": 12
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "residual_learning",
+    "count": 12
+  },
+  {
+    "task": "prognostics",
+    "hybrid": "grey_box",
+    "count": 1
+  }
+]

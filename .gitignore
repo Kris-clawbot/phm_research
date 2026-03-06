@@ -4,8 +4,7 @@ __pycache__/
 *.pyd
 .DS_Store
 
-# Local data
-/data/
+
 *.sqlite
 /tmp/
 
@@ -14,3 +13,9 @@ __pycache__/
 
 # Python venvs
 .venv/
+
+# Local data
+# Keep all of data/ ignored EXCEPT plot JSONs we export.
+/data/
+!/data/plots/
+!/data/plots/**/*.json

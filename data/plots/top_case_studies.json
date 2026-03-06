@@ -1,0 +1,39 @@
+{
+  "id": "top_case_studies",
+  "title": "Top case studies",
+  "version": 1,
+  "encodings": {
+    "y": "label",
+    "x": "count"
+  },
+  "data": [
+    {
+      "label": "batteries",
+      "count": 59
+    },
+    {
+      "label": "turbofan_engines",
+      "count": 32
+    },
+    {
+      "label": "bearings",
+      "count": 30
+    },
+    {
+      "label": "rail",
+      "count": 4
+    },
+    {
+      "label": "wind_turbines",
+      "count": 3
+    },
+    {
+      "label": "gearboxes",
+      "count": 2
+    },
+    {
+      "label": "motors",
+      "count": 1
+    }
+  ]
+}

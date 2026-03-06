@@ -24,6 +24,7 @@ TASK_PATTERNS: list[tuple[str, list[str]]] = [
 ]
 
 HYBRID_PATTERNS: list[tuple[str, list[str]]] = [
+    ("predictive_maintenance", ["predictive maintenance", "condition monitoring"]),
     ("physics_informed", ["physics-informed", "physics informed", "pinn", "physical constraint", "governing equation"]),
     ("grey_box", ["grey-box", "gray-box", "semi-physical", "semi physical"]),
     ("digital_twin", ["digital twin"]),

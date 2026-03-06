@@ -14,6 +14,11 @@ All directions from Kris and future tasks found via evaluation go here. Tasks ge
 - [IN PROGRESS] Implement caching with default settings (TTL 24h for search + metadata; prune stale >7d; local fs store) and document clearly in README.
 - [IN PROGRESS] Extend paper search to include not only OpenAlex but also other free APIs (e.g., Semantic Scholar, CORE, arXiv, etc). Implement deduplication logic to merge papers found across sources.
 
+- [IN PROGRESS] Redesign UI to minimal, modern layout; add Overview/Sources/Papers tabs.
+- [IN PROGRESS] Add Sources tab with counts per API (OpenAlex now; S2/arXiv/CORE next).
+- [IN PROGRESS] Improve plots: add task×hybrid heatmap and time trends; export JSONs.
+- [IN PROGRESS] Multi-source ready DB: add 'source' column and indices; tag openalex in sync.
+
 ---
 
 ## Task Log

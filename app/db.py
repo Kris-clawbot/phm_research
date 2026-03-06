@@ -39,6 +39,7 @@ def init_db():
               cited_by_count INTEGER,
               journal TEXT,
               landing_page_url TEXT,
+              source TEXT,
 
               task_types TEXT,
               hybrid_types TEXT,
@@ -92,6 +93,8 @@ def init_db():
             alters.append("ALTER TABLE papers ADD COLUMN rubric_taxonomy_linkage INTEGER")
         if "rubric_total" not in cols:
             alters.append("ALTER TABLE papers ADD COLUMN rubric_total INTEGER")
+        if "source" not in cols:
+            alters.append("ALTER TABLE papers ADD COLUMN source TEXT")
 
         for sql in alters:
             con.execute(sql)
@@ -99,6 +102,7 @@ def init_db():
         con.execute("CREATE INDEX IF NOT EXISTS idx_papers_year ON papers(publication_year);")
         con.execute("CREATE INDEX IF NOT EXISTS idx_papers_doi ON papers(doi);")
         con.execute("CREATE INDEX IF NOT EXISTS idx_papers_openalex_id ON papers(openalex_id);")
+        con.execute("CREATE INDEX IF NOT EXISTS idx_papers_source ON papers(source);")
         con.commit()
 
 
@@ -108,9 +112,9 @@ def upsert_paper(p: dict):
             """
             INSERT INTO papers (
               id, openalex_id, doi, title, authors, abstract, work_type, is_review,
-              publication_year, publication_date, cited_by_count, journal, landing_page_url,
+              publication_year, publication_date, cited_by_count, journal, landing_page_url, source,
               task_types, hybrid_types, case_study, methods
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
               openalex_id=excluded.openalex_id,
               doi=excluded.doi,
@@ -124,6 +128,7 @@ def upsert_paper(p: dict):
               cited_by_count=excluded.cited_by_count,
               journal=excluded.journal,
               landing_page_url=excluded.landing_page_url,
+              source=excluded.source,
               task_types=excluded.task_types,
               hybrid_types=excluded.hybrid_types,
               case_study=excluded.case_study,
@@ -143,6 +148,7 @@ def upsert_paper(p: dict):
                 p.get("cited_by_count"),
                 p.get("journal"),
                 p.get("landing_page_url"),
+                p.get("source"),
                 p.get("task_types"),
                 p.get("hybrid_types"),
                 p.get("case_study"),

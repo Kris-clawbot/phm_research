@@ -26,9 +26,9 @@ def _authors_str(work: dict) -> str | None:
     return ", ".join(names[:6]) + f" (+{len(names)-6})"
 
 
-def normalize_work(work: dict) -> dict:
+def normalize_work(work: dict, source: str = "openalex") -> dict:
     primary_location = work.get("primary_location") or {}
-    source = primary_location.get("source") or {}
+    src = primary_location.get("source") or {}
 
     ids = work.get("ids") or {}
 
@@ -53,8 +53,9 @@ def normalize_work(work: dict) -> dict:
         "publication_year": work.get("publication_year"),
         "publication_date": work.get("publication_date"),
         "cited_by_count": work.get("cited_by_count"),
-        "journal": source.get("display_name"),
+        "journal": (src.get("display_name") if isinstance(src, dict) else None),
         "landing_page_url": (primary_location.get("landing_page_url") or ids.get("openalex")),
+        "source": source,
         "task_types": ",".join(tax.task_types) if tax.task_types else None,
         "hybrid_types": ",".join(tax.hybrid_types) if tax.hybrid_types else None,
         "case_study": tax.case_study,
@@ -79,7 +80,7 @@ def sync(
     for page in range(1, pages + 1):
         data = search_works(query=query, per_page=per_page, page=page, from_date=from_date)
         for w in data.get("results", []):
-            p = normalize_work(w)
+            p = normalize_work(w, source="openalex")
             if p.get("id") and p.get("title"):
                 upsert_paper(p)
                 inserted += 1

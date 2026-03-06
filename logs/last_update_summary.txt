@@ -1,5 +1,6 @@
-Update: PHM 3-hour update run at 2026-03-06T14:39:54Z (UTC)
-Status: OK
-Changes: none
-Cache: default TTL 24h; prune >7d; store=/data/.openclaw/workspace/phm_research/cache
-Logs: /data/.openclaw/workspace/phm_research/logs/update_job.log
+Update: 1-hr improvement loop started
+Status: RUNNING
+Focus: UI minimalism, better plots, new Sources tab
+Data: multi-source DB field added (source), OpenAlex sync tags source=openalex
+Next: add sources table + counts, wire plots to exported JSONs
+Branch: dashboard master; logs on main

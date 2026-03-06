@@ -1,0 +1,10 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+TZ=Europe/Berlin
+
+# PHM Research Dashboard cron jobs
+# Update job: every 3 hours
+0 */3 * * * /data/.openclaw/workspace/phm_research/scripts/update_job.sh >> /data/.openclaw/workspace/phm_research/logs/cron_update.log 2>&1
+
+# Search job: every 24 hours at 03:30
+30 3 * * * /data/.openclaw/workspace/phm_research/scripts/search_job.sh >> /data/.openclaw/workspace/phm_research/logs/cron_search.log 2>&1

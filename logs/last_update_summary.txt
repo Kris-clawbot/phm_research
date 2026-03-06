@@ -1,15 +1,5 @@
-Update: PHM 3-hour update run at 2026-03-06T13:23:42Z (UTC)
+Update: PHM 3-hour update run at 2026-03-06T14:39:54Z (UTC)
 Status: OK
 Changes: none
 Cache: default TTL 24h; prune >7d; store=/data/.openclaw/workspace/phm_research/cache
 Logs: /data/.openclaw/workspace/phm_research/logs/update_job.log
-
-Update: Evaluator run at 2026-03-06T13:27:14Z (UTC)
-Status: OK
-Counts: n_scored=219, excellent=142, good=39, needs_improvement=21, poor=17
-Recs: Tighten summarizer formatting to keep <420 chars and explicitly name tasks/hybrid.
-
-Update: Applied improvement patch to taxonomy (predictive_maintenance cues)
-Status: OK
-Changes: taxonomy expanded to better match 'predictive maintenance' and 'condition monitoring'
-Repo: phm_research (dashboard code on master)

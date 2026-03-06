@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+
+# Local data
+/data/
+*.sqlite
+/tmp/
+
+# Streamlit
+.streamlit/
+
+# Python venvs
+.venv/

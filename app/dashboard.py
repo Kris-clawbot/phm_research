@@ -110,7 +110,7 @@ with ov:
             hh = hdf.groupby(["task_types", "hybrid_types"]).size().reset_index(name="count")
             hh = hh[(hh["task_types"].notna()) & (hh["hybrid_types"].notna())]
             if not hh.empty:
-                pivot = hh.pivot_table(index="task_types", columns="hybrid_types", values="count", fill_value=0)
+                pivot = hh.pivot_table(index="task_types", columns="hybrid_types", values="count", fill_value=0, aggfunc="sum").astype(int)
                 fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
                 sns.heatmap(pivot, cmap="Blues", linewidths=.5, annot=True, fmt="d", ax=ax)
                 ax.set_xlabel("Hybrid"); ax.set_ylabel("Task")
@@ -191,24 +191,25 @@ with papers_tab:
         options = df2["id"].tolist()
         if options:
             selected = st.selectbox("Select paper (by title)", options=options, format_func=lambda pid: df2.loc[df2["id"] == pid, "title"].iloc[0])
-            paper = get_paper(selected)
-            if paper:
-                st.markdown(f"### {paper['title']}")
+            paper_row = get_paper(selected)
+            if paper_row:
+                paper = dict(paper_row)
+                st.markdown(f"### {paper.get('title', '')}")
                 meta_cols = st.columns(4)
-                meta_cols[0].metric("Date", paper["publication_date"] or "")
-                meta_cols[1].metric("Citations", paper["cited_by_count"] if paper["cited_by_count"] is not None else "")
-                meta_cols[2].write("**Type**"); meta_cols[2].write("review" if pd.to_numeric(paper["is_review"], errors="coerce") == 1 else (paper["work_type"] or "article"))
+                meta_cols[0].metric("Date", paper.get("publication_date") or "")
+                meta_cols[1].metric("Citations", paper.get("cited_by_count") if paper.get("cited_by_count") is not None else "")
+                meta_cols[2].write("**Type**"); meta_cols[2].write("review" if pd.to_numeric(paper.get("is_review"), errors="coerce") == 1 else (paper.get("work_type") or "article"))
                 meta_cols[3].write("**Source**"); meta_cols[3].write(paper.get("source") or "—")
                 if paper.get("doi"): st.write(paper["doi"]) 
                 if paper.get("openalex_id"): st.write(paper["openalex_id"]) 
                 st.write("**Taxonomy**"); st.write({
-                    "task_types": paper["task_types"],
-                    "hybrid_types": paper["hybrid_types"],
-                    "case_study": paper["case_study"],
-                    "methods": paper["methods"],
+                    "task_types": paper.get("task_types"),
+                    "hybrid_types": paper.get("hybrid_types"),
+                    "case_study": paper.get("case_study"),
+                    "methods": paper.get("methods"),
                 })
                 st.write("**Summary (MVP)**")
-                if paper["abstract"]:
+                if paper.get("abstract"):
                     summary = " ".join(textwrap.wrap(paper["abstract"], width=120)[:6])
                     st.write(summary)
                 else:

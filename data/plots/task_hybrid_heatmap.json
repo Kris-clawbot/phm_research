@@ -2,7 +2,12 @@
   {
     "task": "(none)",
     "hybrid": "(none)",
-    "count": 44
+    "count": 43
+  },
+  {
+    "task": "(none)",
+    "hybrid": "predictive_maintenance",
+    "count": 2
   },
   {
     "task": "(none)",
@@ -63,6 +68,11 @@
     "task": "diagnostics",
     "hybrid": "(none)",
     "count": 17
+  },
+  {
+    "task": "diagnostics",
+    "hybrid": "predictive_maintenance",
+    "count": 1
   },
   {
     "task": "diagnostics",

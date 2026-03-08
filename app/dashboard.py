@@ -91,7 +91,7 @@ with ov:
     with cA:
         st.markdown("**Papers per year (by type)**")
         tmp = df.copy()
-        tmp["type"] = tmp["is_review"].map(lambda x: "review" if int(x or 0) == 1 else "article")
+        tmp["type"] = pd.to_numeric(tmp["is_review"], errors="coerce").fillna(0).astype(int).map(lambda v: "review" if v == 1 else "article")
         tmp = tmp[tmp["publication_year"].notna()].groupby(["publication_year", "type"]).size().reset_index(name="count")
         if not tmp.empty:
             fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
@@ -175,7 +175,7 @@ with papers_tab:
         "journal": "Journal", "source": "Source", "authors": "Authors",
         "title": "Title", "doi": "DOI", "openalex_id": "OpenAlex ID",
     }, inplace=True)
-    df_show["Review?"] = df_show["Review?"].map(lambda x: "review" if int(x or 0) == 1 else "article")
+    df_show["Review?"] = pd.to_numeric(df_show["Review?"], errors="coerce").fillna(0).astype(int).map(lambda v: "review" if v == 1 else "article")
 
     st.dataframe(
         df_show,
@@ -197,7 +197,7 @@ with papers_tab:
                 meta_cols = st.columns(4)
                 meta_cols[0].metric("Date", paper["publication_date"] or "")
                 meta_cols[1].metric("Citations", paper["cited_by_count"] if paper["cited_by_count"] is not None else "")
-                meta_cols[2].write("**Type**"); meta_cols[2].write("review" if int(paper["is_review"] or 0) == 1 else (paper["work_type"] or "article"))
+                meta_cols[2].write("**Type**"); meta_cols[2].write("review" if pd.to_numeric(paper["is_review"], errors="coerce") == 1 else (paper["work_type"] or "article"))
                 meta_cols[3].write("**Source**"); meta_cols[3].write(paper.get("source") or "—")
                 if paper.get("doi"): st.write(paper["doi"]) 
                 if paper.get("openalex_id"): st.write(paper["openalex_id"]) 

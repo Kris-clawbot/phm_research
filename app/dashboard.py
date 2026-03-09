@@ -56,6 +56,32 @@ if not rows:
 
 df = pd.DataFrame([dict(r) for r in rows])
 
+# Derive provider/platform for display (provider=ingest source, platform=publisher site)
+_df = df.copy()
+_df["provider"] = _df.get("source").fillna("unknown") if "source" in _df.columns else "unknown"
+
+import re
+
+def _infer_platform(url: str | None, doi: str | None) -> str | None:
+    u = (url or "").lower()
+    d = (doi or "").lower()
+    if "arxiv.org" in u or d.startswith("10.48550/"): return "arxiv"
+    if "ieeexplore.ieee.org" in u or d.startswith("10.1109/"): return "ieee"
+    if "sciencedirect.com" in u or d.startswith("10.1016/"): return "sciencedirect"
+    if "link.springer.com" in u or d.startswith("10.1007/"): return "springer"
+    if "dl.acm.org" in u or d.startswith("10.1145/"): return "acm"
+    if "onlinelibrary.wiley.com" in u: return "wiley"
+    if "mdpi.com" in u or d.startswith("10.3390/"): return "mdpi"
+    if "nature.com" in u or d.startswith("10.1038/"): return "nature"
+    if "tandfonline.com" in u: return "tandf"
+    if "frontiersin.org" in u: return "frontiers"
+    if "hindawi.com" in u: return "hindawi"
+    if "journals.sagepub.com" in u or "sagepub.com" in u: return "sage"
+    return None
+
+_df["platform_inferred"] = _df.apply(lambda r: _infer_platform(r.get("landing_page_url"), r.get("doi")), axis=1)
+_df["platform_display"] = _df["platform_inferred"].fillna("unknown")
+
 def _split_to_rows(df: pd.DataFrame, col: str) -> pd.DataFrame:
     # split comma lists into rows
     out = []
@@ -123,10 +149,31 @@ with ov:
 with src_tab:
     st.subheader("Sources overview")
     if "source" in df.columns:
-        by_src = df.groupby("source").size().reset_index(name="count").sort_values("count", ascending=False)
+        by_provider = (
+            _df.assign(provider=_df["provider"].fillna("unknown"))
+              .groupby("provider")
+              .size()
+              .reset_index(name="count")
+              .sort_values("count", ascending=False)
+        )
+        by_platform = (
+            _df.assign(platform=_df.get("platform").fillna(_df["platform_display"]) if "platform" in _df.columns else _df["platform_display"])\
+              .groupby("platform")
+              .size()
+              .reset_index(name="count")
+              .sort_values("count", ascending=False)
+        )
     else:
-        by_src = pd.DataFrame({"source": ["openalex"], "count": [len(df)]})
-    st.dataframe(by_src, use_container_width=True, hide_index=True)
+        by_provider = pd.DataFrame({"provider": ["unknown"], "count": [len(df)]})
+        by_platform = pd.DataFrame({"platform": ["unknown"], "count": [len(df)]})
+
+    csp1, csp2 = st.columns(2)
+    with csp1:
+        st.write("Provider (ingest source)")
+        st.dataframe(by_provider, use_container_width=True, hide_index=True)
+    with csp2:
+        st.write("Platform (publisher/site)")
+        st.dataframe(by_platform, use_container_width=True, hide_index=True)
 
 with papers_tab:
     st.subheader("Papers")

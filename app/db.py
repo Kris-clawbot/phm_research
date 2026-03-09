@@ -39,7 +39,8 @@ def init_db():
               cited_by_count INTEGER,
               journal TEXT,
               landing_page_url TEXT,
-              source TEXT,
+              source TEXT,         -- data provider (openalex, arxiv-api, crossref, scraper, ...)
+              platform TEXT,       -- publisher/platform (ieee, springer, arxiv, ...)
 
               task_types TEXT,
               hybrid_types TEXT,
@@ -95,6 +96,8 @@ def init_db():
             alters.append("ALTER TABLE papers ADD COLUMN rubric_total INTEGER")
         if "source" not in cols:
             alters.append("ALTER TABLE papers ADD COLUMN source TEXT")
+        if "platform" not in cols:
+            alters.append("ALTER TABLE papers ADD COLUMN platform TEXT")
 
         for sql in alters:
             con.execute(sql)
@@ -106,15 +109,38 @@ def init_db():
         con.commit()
 
 
+def backfill_sources():
+    """Heuristically backfill missing source values for older rows."""
+    with connect() as con:
+        rules = [
+            ("openalex", "openalex_id IS NOT NULL OR landing_page_url LIKE '%openalex%'"),
+            ("arxiv", "landing_page_url LIKE '%arxiv.org%' OR doi LIKE '10.48550/%'"),
+            ("ieee", "landing_page_url LIKE '%ieeexplore.ieee.org%' OR doi LIKE '10.1109/%'"),
+            ("sciencedirect", "landing_page_url LIKE '%sciencedirect.com%' OR doi LIKE '10.1016/%'"),
+            ("springer", "landing_page_url LIKE '%link.springer.com%' OR doi LIKE '10.1007/%'"),
+            ("acm", "landing_page_url LIKE '%dl.acm.org%' OR doi LIKE '10.1145/%'"),
+            ("wiley", "landing_page_url LIKE '%onlinelibrary.wiley.com%'"),
+            ("mdpi", "landing_page_url LIKE '%mdpi.com%' OR doi LIKE '10.3390/%'"),
+            ("nature", "landing_page_url LIKE '%nature.com%' OR doi LIKE '10.1038/%'"),
+            ("tandf", "landing_page_url LIKE '%tandfonline.com%'"),
+        ]
+        for src, cond in rules:
+            con.execute(
+                f"UPDATE papers SET source=? WHERE (source IS NULL OR source='') AND ({cond})",
+                (src,),
+            )
+        con.commit()
+
+
 def upsert_paper(p: dict):
     with connect() as con:
         con.execute(
             """
             INSERT INTO papers (
               id, openalex_id, doi, title, authors, abstract, work_type, is_review,
-              publication_year, publication_date, cited_by_count, journal, landing_page_url, source,
+              publication_year, publication_date, cited_by_count, journal, landing_page_url, source, platform,
               task_types, hybrid_types, case_study, methods
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
               openalex_id=excluded.openalex_id,
               doi=excluded.doi,
@@ -129,6 +155,7 @@ def upsert_paper(p: dict):
               journal=excluded.journal,
               landing_page_url=excluded.landing_page_url,
               source=excluded.source,
+              platform=excluded.platform,
               task_types=excluded.task_types,
               hybrid_types=excluded.hybrid_types,
               case_study=excluded.case_study,
@@ -149,6 +176,7 @@ def upsert_paper(p: dict):
                 p.get("journal"),
                 p.get("landing_page_url"),
                 p.get("source"),
+                p.get("platform"),
                 p.get("task_types"),
                 p.get("hybrid_types"),
                 p.get("case_study"),

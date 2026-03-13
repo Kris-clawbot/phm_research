@@ -33,10 +33,71 @@ with st.sidebar:
             total += n
 
         if include_scopus:
-            # Simple Scopus query: use TITLE-ABS-KEY() and a rolling 7-day publication date window
-            # (Scopus query language differs from OpenAlex; this is a pragmatic default.)
-            from_yyyymmdd = from_date.replace("-", "")
-            scopus_q = f'TITLE-ABS-KEY({query}) AND PUBDATETXT(AFT {from_yyyymmdd})'
+            # Scopus query language differs from OpenAlex.
+            # PUBDATETXT(AFT ...) looks tempting, but in practice often yields 0 results
+            # (format/field semantics differ). Use a coarse-but-reliable year filter instead.
+            try:
+                y = int((from_date or "").split("-", 1)[0])
+            except Exception:
+                y = None
+
+            # Build a Scopus-safe query.
+            # Scopus expects explicit boolean operators; raw free-text with hyphens can trigger 400.
+            def _scopus_terms_or(text: str, max_terms: int = 12) -> str:
+                """Turn a free-text query into a Scopus-safe OR query.
+
+                Scopus is picky: long AND-chains + hyphenated tokens often yield 0 results or 400.
+                For discovery, OR is the right default; we rely on the DB de-dup + filters later.
+                """
+                raw = " ".join((text or "").replace("\n", " ").split())
+                low = raw.lower()
+
+                # Prefer a few meaningful phrases if present
+                phrases = [
+                    "prognostics health management",
+                    "remaining useful life",
+                    "digital twin",
+                    "hybrid model",
+                    "physics-informed",
+                    "grey-box",
+                ]
+
+                picked: list[str] = []
+                for ph in phrases:
+                    if ph in low:
+                        picked.append(f'"{ph}"')
+                        low = low.replace(ph, " ")
+
+                # Remaining tokens
+                toks = [t.strip() for t in low.split() if t.strip()]
+                for t in toks:
+                    # skip very short noise
+                    if len(t) < 3:
+                        continue
+                    t = t.replace('"', "")
+                    if any((not ch.isalnum()) for ch in t):
+                        picked.append(f'"{t}"')
+                    else:
+                        picked.append(t)
+
+                # de-dup while preserving order
+                seen = set()
+                uniq = []
+                for t in picked:
+                    if t not in seen:
+                        seen.add(t)
+                        uniq.append(t)
+                    if len(uniq) >= max_terms:
+                        break
+
+                return " OR ".join(uniq)
+
+            scopus_terms = _scopus_terms_or(query)
+            scopus_q = f"TITLE-ABS-KEY({scopus_terms})" if scopus_terms else "TITLE-ABS-KEY(\"prognostics\")"
+            if y:
+                # Scopus doesn't accept ">=" here; use a strict greater-than on previous year.
+                scopus_q += f" AND PUBYEAR > {y-1}"
+
             with st.spinner("Fetching from Scopus (Elsevier)..."):
                 from sync import sync_scopus
                 n2 = sync_scopus(

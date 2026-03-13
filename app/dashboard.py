@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from db import init_db, list_papers, get_paper, update_taxonomy, iter_papers
-from sync import sync, DEFAULT_QUERY
+from sync import sync, DEFAULT_QUERY, last_week_date
 from taxonomy import classify
 
 import matplotlib.pyplot as plt
@@ -20,13 +20,34 @@ init_db()
 with st.sidebar:
     st.header("Sync")
     query = st.text_area("Search query", value=DEFAULT_QUERY, height=100)
-    from_date = st.text_input("From date (YYYY-MM-DD)", value="2025-01-01")
+    from_date = st.text_input("From date (YYYY-MM-DD)", value=last_week_date())
     pages = st.slider("Pages", min_value=1, max_value=20, value=5)
     per_page = st.slider("Per page", min_value=10, max_value=200, value=50, step=10)
+    include_scopus = st.checkbox("Also sync from Scopus (Elsevier)", value=False)
+    enrich_scopus_abstracts = st.checkbox("Scopus: fetch abstracts (uses quota)", value=False)
+
     if st.button("Sync now", type="primary"):
+        total = 0
         with st.spinner("Fetching from OpenAlex..."):
             n = sync(query=query, pages=pages, per_page=per_page, from_date=from_date)
-        st.success(f"Synced {n} records (upserted).")
+            total += n
+
+        if include_scopus:
+            # Simple Scopus query: use TITLE-ABS-KEY() and a rolling 7-day publication date window
+            # (Scopus query language differs from OpenAlex; this is a pragmatic default.)
+            from_yyyymmdd = from_date.replace("-", "")
+            scopus_q = f'TITLE-ABS-KEY({query}) AND PUBDATETXT(AFT {from_yyyymmdd})'
+            with st.spinner("Fetching from Scopus (Elsevier)..."):
+                from sync import sync_scopus
+                n2 = sync_scopus(
+                    scopus_q,
+                    count=25,
+                    start=0,
+                    enrich_abstracts=enrich_scopus_abstracts,
+                )
+                total += n2
+
+        st.success(f"Synced {total} records (upserted).")
 
     st.divider()
     st.header("Taxonomy (rules v0)")
@@ -255,8 +276,12 @@ with papers_tab:
                     "case_study": paper.get("case_study"),
                     "methods": paper.get("methods"),
                 })
-                st.write("**Summary (MVP)**")
-                if paper.get("abstract"):
+                st.write("**Summary**")
+                if paper.get("summary_text"):
+                    st.write(paper["summary_text"])  # compact, rubric-aligned summary
+                    if paper.get("rubric_total") is not None:
+                        st.caption(f"Rubric score: {paper['rubric_total']}")
+                elif paper.get("abstract"):
                     summary = " ".join(textwrap.wrap(paper["abstract"], width=120)[:6])
                     st.write(summary)
                 else:

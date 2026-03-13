@@ -1,15 +1,15 @@
 [
   {
     "task": "prognostics",
-    "count": 145
+    "count": 151
   },
   {
     "task": "diagnostics",
-    "count": 31
+    "count": 38
   },
   {
     "task": "fault_detection",
-    "count": 19
+    "count": 24
   },
   {
     "task": "anomaly_detection",

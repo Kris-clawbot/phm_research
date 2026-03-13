@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
 
 from db import connect, update_summary_scores, update_taxonomy
 from taxonomy import classify
@@ -18,6 +17,18 @@ class RubricScore:
     @property
     def total(self) -> int:
         return self.coverage + self.clarity + self.relevance + self.informativeness + self.taxonomy_linkage
+
+
+def _trim_to_chars(text: str, limit: int = 420) -> str:
+    if len(text) <= limit:
+        return text
+    # try to cut at last period/comma/semicolon before limit
+    cut = text[:limit]
+    for sep in [". ", "; ", ", "]:
+        idx = cut.rfind(sep)
+        if idx >= 200:  # avoid cutting too early
+            return cut[: idx + 1].rstrip() + " …"
+    return cut.rstrip() + " …"
 
 
 def _format_summary(row) -> str:
@@ -46,8 +57,8 @@ def _format_summary(row) -> str:
         parts.append("Methods: " + ", ".join(methods) + ".")
     parts.append(f"Authors: {auth_str}.")
 
-    # Keep it compact, 2–4 short sentences.
-    return " ".join(parts)
+    # Keep it compact, 2–4 short sentences; hard-trim to 420 chars to hit clarity target.
+    return _trim_to_chars(" ".join(parts), 420)
 
 
 def _score_summary(row, summary: str) -> RubricScore:

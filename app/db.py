@@ -39,8 +39,11 @@ def init_db():
               cited_by_count INTEGER,
               journal TEXT,
               landing_page_url TEXT,
-              source TEXT,         -- data provider (openalex, arxiv-api, crossref, scraper, ...)
+              source TEXT,         -- data provider (openalex, scopus, arxiv-api, crossref, scraper, ...)
               platform TEXT,       -- publisher/platform (ieee, springer, arxiv, ...)
+
+              scopus_id TEXT,      -- numeric scopus id (e.g. 85199264454)
+              scopus_eid TEXT,     -- scopus EID (e.g. 2-s2.0-85199264454)
 
               task_types TEXT,
               hybrid_types TEXT,
@@ -98,6 +101,10 @@ def init_db():
             alters.append("ALTER TABLE papers ADD COLUMN source TEXT")
         if "platform" not in cols:
             alters.append("ALTER TABLE papers ADD COLUMN platform TEXT")
+        if "scopus_id" not in cols:
+            alters.append("ALTER TABLE papers ADD COLUMN scopus_id TEXT")
+        if "scopus_eid" not in cols:
+            alters.append("ALTER TABLE papers ADD COLUMN scopus_eid TEXT")
 
         for sql in alters:
             con.execute(sql)
@@ -106,6 +113,8 @@ def init_db():
         con.execute("CREATE INDEX IF NOT EXISTS idx_papers_doi ON papers(doi);")
         con.execute("CREATE INDEX IF NOT EXISTS idx_papers_openalex_id ON papers(openalex_id);")
         con.execute("CREATE INDEX IF NOT EXISTS idx_papers_source ON papers(source);")
+        con.execute("CREATE INDEX IF NOT EXISTS idx_papers_scopus_id ON papers(scopus_id);")
+        con.execute("CREATE INDEX IF NOT EXISTS idx_papers_scopus_eid ON papers(scopus_eid);")
         con.commit()
 
 
@@ -139,8 +148,9 @@ def upsert_paper(p: dict):
             INSERT INTO papers (
               id, openalex_id, doi, title, authors, abstract, work_type, is_review,
               publication_year, publication_date, cited_by_count, journal, landing_page_url, source, platform,
+              scopus_id, scopus_eid,
               task_types, hybrid_types, case_study, methods
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
               openalex_id=excluded.openalex_id,
               doi=excluded.doi,
@@ -156,6 +166,8 @@ def upsert_paper(p: dict):
               landing_page_url=excluded.landing_page_url,
               source=excluded.source,
               platform=excluded.platform,
+              scopus_id=excluded.scopus_id,
+              scopus_eid=excluded.scopus_eid,
               task_types=excluded.task_types,
               hybrid_types=excluded.hybrid_types,
               case_study=excluded.case_study,
@@ -177,6 +189,8 @@ def upsert_paper(p: dict):
                 p.get("landing_page_url"),
                 p.get("source"),
                 p.get("platform"),
+                p.get("scopus_id"),
+                p.get("scopus_eid"),
                 p.get("task_types"),
                 p.get("hybrid_types"),
                 p.get("case_study"),
@@ -194,9 +208,9 @@ def list_papers(limit: int = 300, year_min: int | None = None, q: str | None = N
         where.append("publication_date >= ?")
         params.append(f"{year_min:04d}-01-01")
     if q:
-        where.append("(title LIKE ? OR abstract LIKE ? OR journal LIKE ? OR authors LIKE ? OR doi LIKE ? OR openalex_id LIKE ?)")
+        where.append("(title LIKE ? OR abstract LIKE ? OR journal LIKE ? OR authors LIKE ? OR doi LIKE ? OR openalex_id LIKE ? OR scopus_eid LIKE ? OR scopus_id LIKE ?)")
         like = f"%{q}%"
-        params.extend([like, like, like, like, like, like])
+        params.extend([like, like, like, like, like, like, like, like])
     if reviews_only is True:
         where.append("is_review = 1")
     elif reviews_only is False:
